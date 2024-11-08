@@ -88,8 +88,8 @@ export default function Header() {
               </span>
             </Dropdown.Header>
             {/* {currentUser.isRegistered && ( */}
-                <Link to={'/dashboard?tab=profile'}>
-              <Dropdown.Item>Profile</Dropdown.Item>
+                <Link to={'/dashboard?tab=settings'}>
+              <Dropdown.Item>Settings</Dropdown.Item>
             </Link>
             
            
