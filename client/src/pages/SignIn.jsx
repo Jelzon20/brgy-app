@@ -1,14 +1,58 @@
+import { useState } from 'react';
 import {Button, Label, Spinner, TextInput } from 'flowbite-react';
-import logo from "../assets/logo.png";
-import { Link } from 'react-router-dom';
-
+import logo from "../assets/signin.png";
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { SignInStart, signInSuccess, signInFailure } from '../../redux/user/userSlice';
+import { Toaster, toast } from 'sonner'
 
 export default function SignIn() {  
- 
+  const [formData, setFormData] = useState({});
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  
+
+  const handleChange = (e) => { 
+    setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.email || !formData.password) {
+      
+      dispatch(signInFailure('Please fill all the fields'));
+      toast.error('Please fill all the fields')
+    }
+    try {
+      dispatch(signInStart());
+      const res = await fetch('/api/auth/signin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(signInFailure(data.message));
+        
+        toast.error(data.message)
+      }
+
+      if (res.ok) {
+        localStorage.setItem('expiresIn', expireTime);
+        dispatch(signInSuccess(data));
+        toast.success("Sign in successful")
+        navigate('/');
+      }
+    } catch (error) {
+      dispatch(signInFailure(error.message));
+      toast.error(error.message)
+    }
+  };
+
 
   return (
     <div className='min-h-screen mt-20'>
-      {/* <Toaster richColors position="top-center" expand={true} /> */}
+      <Toaster richColors position="top-center" expand={true} />
    
       <div className='flex p-3 max-w-3xl mx-auto flex-col md:flex-row md:items-center gap-5'>
         {/* left */}
@@ -60,12 +104,7 @@ export default function SignIn() {
               Sign In
             </Button>
           </form>
-          <div className='flex gap-2 text-sm mt-5'>
-            <span>Don't Have an account?</span>
-            <Link to='/signup' className='text-indigo-950'>
-              Sign Up
-            </Link>
-          </div>
+         
         </div>
       </div>
     </div>

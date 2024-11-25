@@ -1,9 +1,50 @@
+import { useState } from 'react';
 import { Alert, Button, Label, Spinner, TextInput } from 'flowbite-react';
-import logo from "../assets/logo.png";
-import { Link } from 'react-router-dom';
-
+import logo from "../assets/signin.png";
+import { Link, useNavigate} from 'react-router-dom';
+import { Toaster, toast } from 'sonner'
 
 export default function SignUp() {
+  const [formData, setFormData] = useState({});
+
+  const handleChange = (e) => { 
+    setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if ( !formData.email || !formData.password) {
+      toast.error("Please fill out all fields.")
+      // return setErrorMessage('Please fill out all fields.');
+    } 
+    
+    // try {
+    //   setLoading(true);
+    //   setErrorMessage(null);
+    //   const res = await fetch('/api/auth/signup', {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify(formData),
+    //   });
+    //   const data = await res.json();
+    //   if (data.success === false) {
+    //     setErrorMessage(data.message);
+    //     toast.error(data.message);
+    //     setLoading(false);
+    //   }
+    //   setLoading(false);
+    //   if(res.ok) {
+    //     toast.success("Account has been created")
+    //     navigate('/sign-in');
+    //   }
+    // } 
+    // catch (error) {
+    //   setErrorMessage(error.message);
+    //   toast.error(error.message);
+    //   setLoading(false);
+    // }
+    
+  };
  
 
   return (
