@@ -3,12 +3,15 @@ import { Avatar, Button, Dropdown, Navbar, TextInput } from 'flowbite-react';
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import webLogo from "../assets/abucayLogo.png";
+import { useSelector, useDispatch } from 'react-redux';
+import { signoutSuccess } from '../../redux/user/userSlice';
 
 
 export default function Header() {
   const path = useLocation().pathname;
+  const { currentUser } = useSelector((state) => state.user);
   const navigate = useNavigate();
-//   const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
   const [hasToken, setHasToken] = useState(true);
    
@@ -42,24 +45,23 @@ export default function Header() {
     //     handleVolunteerSignout();
     //   }
     // });
-//   const handleSignout = async () => {
-//     try {
-//       const res = await fetch('/api/user/signout', {
-//         method: 'POST',
-//       });
-//       const data = await res.json();
-//       if (!res.ok) {
-//         console.log(data.message);
-//       } else {
-//         dispatch(signoutSuccess());
-//         localStorage.removeItem('expiresIn');
-//         dispatch(clearRegSuccess())
-//         navigate('/sign-in');
-//       }
-//     } catch (error) {
-//       console.log(error.message);
-//     }
-//   };
+  const handleSignout = async () => {
+    try {
+      const res = await fetch('/api/auth/signout', {
+        method: 'POST',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        console.log(data.message);
+      } else {
+        dispatch(signoutSuccess());
+        localStorage.removeItem('expiresIn');
+        navigate('/signin');
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
   return (
 
@@ -71,7 +73,7 @@ export default function Header() {
         <img src={webLogo} alt="NCYM Logo" className='w-32' />
       </Link>
       <div className='flex gap-2 md:order-2'>
-        {/* {currentUser ? ( */}
+        {currentUser ? (
           <Dropdown
             arrowIcon={false}
             inline
@@ -84,7 +86,7 @@ export default function Header() {
             <Dropdown.Header>
 
               <span className='block text-sm font-medium truncate'>
-                {/* {currentUser.email} */}
+                {currentUser.email}
               </span>
             </Dropdown.Header>
             {/* {currentUser.isRegistered && ( */}
@@ -96,12 +98,12 @@ export default function Header() {
             {/* )} */}
             <Dropdown.Divider />
             <Dropdown.Item 
-            // onClick={handleSignout}
+            onClick={handleSignout}
             >Sign out</Dropdown.Item>
           </Dropdown>
-        {/* ) : (
+     ) : (
           <></>
-        )} */}
+        )}
         <Navbar.Toggle />
       </div>
 
