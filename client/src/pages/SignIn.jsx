@@ -2,12 +2,14 @@ import { useState } from 'react';
 import {Button, Label, Spinner, TextInput } from 'flowbite-react';
 import logo from "../assets/signin.png";
 import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { SignInStart, signInSuccess, signInFailure } from '../../redux/user/userSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { signInStart, signInSuccess, signInFailure } from '../../redux/user/userSlice';
 import { Toaster, toast } from 'sonner'
 
 export default function SignIn() {  
+  const expireTime = Date.now() + 3600000;
   const [formData, setFormData] = useState({});
+  const { loading, error: errorMessage, currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   
@@ -66,7 +68,7 @@ export default function SignIn() {
           <h1 className='text-gray-800 font-bold text-3xl mb-5"'>Welcome back!</h1>
           <p className='mb-7 mt-1'>Sign In now!</p>
           <form className='flex flex-col gap-4' 
-          // onSubmit={handleSubmit}
+          onSubmit={handleSubmit}
           >
             <div>
               <Label value='Your email' htmlFor='email' className='font-semibold'/>
@@ -74,8 +76,8 @@ export default function SignIn() {
                 type='email'
                 placeholder='name@company.com'
                 id='email'
-                // onChange={handleChange}
-                required
+                onChange={handleChange}
+                // required
               />
             </div>
             <div>
@@ -84,24 +86,23 @@ export default function SignIn() {
                 type='password'
                 placeholder='**********'
                 id='password'
-                // onChange={handleChange}
-                required
+                onChange={handleChange}
+                // required
               />
             </div>
             <Button
               className='bg-indigo-950'
               type='submit'
-              // disabled={loading}
+              disabled={loading}
             >
-              {/* {loading ? (
+              {loading ? (
                 <>
                   <Spinner size='sm' />
                   <span className='pl-3'>Loading...</span>
                 </>
               ) : (
                 'Sign In'
-              )} */}
-              Sign In
+              )} 
             </Button>
           </form>
          
