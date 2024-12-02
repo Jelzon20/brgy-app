@@ -1,16 +1,27 @@
 import React from 'react'
 import { Button } from 'flowbite-react'
 import defaultImg from '../assets/default-img.png'
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState, useEffect  } from "react";
 import { CircularProgressbar } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
+import {
+    getDownloadURL,
+    getStorage,
+    ref,
+    uploadBytesResumable,
+  } from "firebase/storage";
+  import { app } from "../firebase";
 
 export default function DashAddResident() {
+    const [formData, setFormData] = useState({});
     const filePickerRef = useRef();
     const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
   const [imageFileUploadError, setImageFileUploadError] = useState(null);
   const [imageFileUploading, setImageFileUploading] = useState(false);
+
+
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -19,11 +30,109 @@ export default function DashAddResident() {
           setImageFileUrl(URL.createObjectURL(file));
         }
       };
+      useEffect(() => {
+        if (imageFile) {
+          uploadImage();
+        }
+      }, [imageFile]);
+
+      const uploadImage = async () => {
+        // service firebase.storage {
+        //   match /b/{bucket}/o {
+        //     match /{allPaths=**} {
+        //       allow read;
+        //       allow write: if
+        //       request.resource.size < 2 * 1024 * 1024 &&
+        //       request.resource.contentType.matches('image/.*');
+        //     }
+        //   }
+        // }
+        setImageFileUploading(true);
+        setImageFileUploadError(null);
+        const storage = getStorage(app);
+        const fileName = imageFile.name;
+        const storageRef = ref(storage, fileName);
+        const uploadTask = uploadBytesResumable(storageRef, imageFile);
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            const progress =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+    
+            setImageFileUploadProgress(progress.toFixed(0));
+          },
+          (error) => {
+            setImageFileUploadError(
+              "Could not upload image (File must be less than 2MB)"
+            );
+            toast.error("Could not upload file (File must be less than 2MB)");
+            setImageFileUploadProgress(null);
+            setImageFile(null);
+            setImageFileUrl(null);
+            setImageFileUploading(false);
+          },
+          () => {
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              setImageFileUrl(downloadURL);
+            //   setFormData({ ...formData, profilePicture: downloadURL });
+              setImageFileUploading(false);
+            });
+          }
+        );
+      };
+
+      const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.id]: e.target.value });
+      };
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+    
+        if (Object.keys(formData).length === 0) {
+          setOpenConfirmModal(false);
+          toast.error("No changes made in sign in info");
+          return;
+        }
+        if (imageFileUploading) {
+          setOpenConfirmModal(false);
+          toast.error("Please wait for image to upload");
+          return;
+        }
+
+        console.log(formData);
+    
+        // try {
+        //   dispatch(updateStart());
+        //   const res = await fetch(`/api/user/update/${currentUser._id}`, {
+        //     method: "PUT",
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //     },
+        //     body: JSON.stringify(formData),
+        //   });
+        //   const data = await res.json();
+        //   if (!res.ok) {
+        //     dispatch(updateFailure(data.message));
+        //     toast.error(data.message);
+        //   } else {
+        //     dispatch(updateSuccess(data));
+        //     toast.success("User's sign in details updated successfully");
+        //   }
+        // } catch (error) {
+        //   dispatch(updateFailure(error.message));
+        //   toast.error(error.message);
+        // }
+      };
   return (
-    <div className="max-w-max mx-auto grid grid-cols-1 px-4 pt-6 xl:grid-cols-3 xl:gap-4 dark:bg-gray-900">
+
+<form onSubmit={handleSubmit} className='w-9/12 mx-auto'>
+    <div className="max-w-full mx-auto grid grid-cols-1 px-4 pt-6 xl:grid-cols-3 xl:gap-4 dark:bg-gray-900">
+        
       {/* <div className="grid grid-cols-1 px-4 pt-6 xl:grid-cols-3 xl:gap-4 dark:bg-gray-900"> */}
     {/* <!-- Right Content --> */}
+     
     <div className="col-span-full xl:col-auto">
+    
         <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
             <div className="items-center flex  flex-col  sm:flex xl:block 2xl:flex sm:space-x-4 xl:space-x-0 2xl:space-x-4">
             <input
@@ -78,7 +187,9 @@ export default function DashAddResident() {
                 </div>
             </div>
         </div>
+       
         <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+            
             <h3 className="mb-4 text-xl font-semibold dark:text-white">Other Info</h3>
             <div className="mb-4">
                 <label htmlFor="household" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Household No.</label>
@@ -93,7 +204,7 @@ export default function DashAddResident() {
     <div className="col-span-2">
         <div className="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
             <h3 className="mb-4 text-xl font-semibold dark:text-white">General information</h3>
-            <form action="#">
+            
                 <div className="grid grid-cols-6 gap-6">
                     <div className="col-span-6 sm:col-span-2">
                         <label htmlFor="first_name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">First Name</label>
@@ -101,7 +212,7 @@ export default function DashAddResident() {
                     </div>
                     <div className="col-span-6 sm:col-span-2">
                         <label htmlFor="middle-name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Middle Name</label>
-                        <input type="text" name="middle_name" id="middle_name" className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="" required />
+                        <input type="text" name="middle_name" id="middle_name" onChange={handleChange} className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="" required />
                     </div>
                     <div className="col-span-6 sm:col-span-2">
                         <label htmlFor="last-name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Last Name</label>
@@ -172,13 +283,16 @@ export default function DashAddResident() {
                             Save all
                         </Button>
                     </div>
-            </form>
+            
         </div>
        
     </div>
-{/*     
-</div> */}
+   
+
 
 </div>
+</form>
+
+
   );
 }
