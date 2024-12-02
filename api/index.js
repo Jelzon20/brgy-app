@@ -9,6 +9,7 @@ import residentRoutes from './routes/resident.route.js';
 dotenv.config();
 
 mongoose.connect(process.env.MONGO).then(() => {
+  // NEW mongo_uri: mongodb+srv://solutionsharnael:solutionsharnael@abucay.fuogn.mongodb.net/?retryWrites=true&w=majority&appName=Abucay
     console.log("MongoDB is connected");}).catch((err) => {
     console.log(err);
   });
