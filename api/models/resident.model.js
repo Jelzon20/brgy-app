@@ -2,74 +2,76 @@ import mongoose from 'mongoose';
 
 
 const residentSchema = new mongoose.Schema({
-    firstname: {
-        type: String,
-        required: true,
-    }, 
-    middlename: {
+    first_name: {
         type: String,
     }, 
-    lastname: {
+    middle_name: {
         type: String,
-        required: true,
+    }, 
+    last_name: {
+        type: String,
     },
     residentPicture: {
         type: String,
-        default:
-          'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png',
       },
-    alias: {
+    place_of_birth: {
         type: String,
-    },
-    placeOfBirth: {
-        type: String,
-        required: true,
     },
     birthday: {
         type: String,
-        required: true,
     },
     age: {
         type: String,
     },
-    civilStatus: {
+    relationship: {
         type: String,
-        required: true,
+    },
+    civil_status: {
+        type: String,
     },
     gender: {
         type: String,
-        required: true,
     },
-    voterStatus: {
+    voter_status: {
         type: String,
     },
     occupation: {
         type: String,
     },
-    educationAttainment: {
+    education_attainment: {
         type: String,
     },
     email: {
         type: String,
     },
-    contactNumber: {
+    contact_number: {
         type: String,
     },
     citizenship: {
         type: String,
-        required: true,
     },
-    address: {
-        type: String,
-        required: true,
-    },
-    lengthOfStay: {
+    fp_method: {
         type: String,
     },
-    householdNo: {
+    pwd: {
         type: String,
     },
-    precinctNo: {
+    fourps: {
+        type: String,
+    },
+    prev_address: {
+        type: String,
+    },
+    cur_address: {
+        type: String,
+    },
+    length_of_stay: {
+        type: String,
+    },
+    household_no: {
+        type: String,
+    },
+    precinct_no: {
         type: String,
     },
 }, {timestamps: true}

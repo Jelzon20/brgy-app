@@ -5,24 +5,11 @@ import { errorHandler } from "../utils/error.js";
 
 export const addResident = async (req, res, next) => {
 
-    const { firstname, middlename, lastname, alias, placeOfBirth, 
-        birthday, age, civilStatus, gender, voterStatus, occupation, educationAttainment, 
-        email, contactNumber, citizenship, address, lengthOfStay, householdNo, precinctNo } = req.body;
-  
-    if (
-      !firstname || firstname == "" ||
-      !lastname || lastname == "" || 
-      !placeOfBirth || placeOfBirth == "" || 
-      !birthday || birthday == "" || 
-      !civilStatus || civilStatus == "" || 
-      !gender || gender == "" || 
-      !citizenship || citizenship == "" || 
-      !address || address == ""
-    ) {
-      next(errorHandler(400, 'Please fill out the required fields.'));
-      return; 
-    }
-  
+    const { first_name, middle_name, last_name, residentPicture, place_of_birth, 
+      birthday, age, relationship, civil_status, gender, voter_status, occupation, 
+      education_attainment, email, contact_number, citizenship, fp_method, pwd, fourps,
+      prev_address, cur_address, length_of_stay, household_no, precinct_no } = req.body;
+
     const newResident = new Resident({
       ...req.body,
     });
