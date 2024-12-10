@@ -13,19 +13,37 @@ import { SearchIcon } from "../Icons/icons";
 import DownloadBtn from "../components/DownloadBtn.jsx";
 import DebouncedInput from "../components/DebouncedInput.jsx";
 import { Toaster, toast } from 'sonner'
+import { Modal} from 'flowbite-react';
+import ViewEditResidentModal from '../components/modals/ViewEditResidentModal.jsx';
+import DeleteResidentModal from '../components/modals/DeleteResidentModal.jsx';
 
 
 export default function Residents() {
   const [residents, setResidents] = useState([]);
+  const [resident, setResident] = useState([]);
   const [data] = useState(() => [...residents]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [fileNameDate, setFileNameDate] = useState('');
   const columnHelper = createColumnHelper();
   
+  const [isViewEditResiModalOpen, setIsViewEditResiModalOpen] = useState(false);
+  const openViewEditResiModal = (resId) => {
+    setResident(resId);
+    setIsViewEditResiModalOpen(true);
+  };
+  const closeViewEditResiModal = () => setIsViewEditResiModalOpen(false);
+
+
+  const [isDeleteResiModalOpen, setIsDeleteResiModalOpen] = useState(false);
+  const openDeleteResiModal = (resId) => {
+    setResident(resId);
+    setIsDeleteResiModalOpen(true);
+  };
+  const closeDeleteResiModal = () => setIsDeleteResiModalOpen(false);
 
   const columns = [
 
-    columnHelper.accessor(residents => residents.resident_photo, {
+    columnHelper.accessor(residents => residents.residentPicture, {
 
       cell: (info) => (
         <img
@@ -36,9 +54,74 @@ export default function Residents() {
       ),
       header: "Resident Photo",
     }),
+    columnHelper.accessor(residents => residents.household_no, {
+      cell: (info) => <span className='mr-10'>{info.getValue()}</span>,
+      header: "Household no.",
+    }),
+    columnHelper.accessor(residents => residents.precinct_no, {
+      cell: (info) => <span className='mr-10'>{info.getValue()}</span>,
+      header: "Precinct No.",
+    }),
     columnHelper.accessor(residents => residents.first_name, {
       cell: (info) => <span className='mr-10'>{info.getValue()}</span>,
       header: "First name",
+    }),
+    columnHelper.accessor(residents => residents.middle_name, {
+      cell: (info) => <span className='mr-10'>{info.getValue()}</span>,
+      header: "middle name",
+    }),
+    columnHelper.accessor(residents => residents.first_name, {
+      cell: (info) => <span className='mr-10'>{info.getValue()}</span>,
+      header: "Last name",
+    }),
+    columnHelper.accessor(residents => residents.age, {
+      cell: (info) => <span className='mr-10'>{info.getValue()}</span>,
+      header: "Age",
+    }),
+    columnHelper.accessor(residents => residents.relationship, {
+      cell: (info) => <span className='mr-10'>{info.getValue()}</span>,
+      header: "Relationship",
+    }),
+    columnHelper.accessor(residents => residents.civil_status, {
+      cell: (info) => <span className='mr-10'>{info.getValue()}</span>,
+      header: "Civil Status",
+    }),
+    columnHelper.accessor(residents => residents.citizenship, {
+      cell: (info) => <span className='mr-10'>{info.getValue()}</span>,
+      header: "Citizenship",
+    }),
+    columnHelper.accessor(residents => residents.voter_status, {
+      cell: (info) => <span className='mr-10'>{info.getValue()}</span>,
+      header: "Voter Status",
+    }),
+    columnHelper.accessor(residents => residents.cur_address, {
+      cell: (info) => <span className='mr-10'>{info.getValue()}</span>,
+      header: "Current address",
+    }),
+    columnHelper.accessor("_id", {
+      cell: (info) => (
+        <>
+          <span
+            onClick={() => {
+              openViewEditResiModal(info.getValue());
+              // setUserIdToView(info.getValue());
+              // handleViewUser(info.getValue())
+            }}
+            className='pr-4 font-medium text-green-500 hover:underline cursor-pointer'
+          >
+            View/Edit
+          </span>
+          <span
+            onClick={() => {
+              openDeleteResiModal(info.getValue());
+            }}
+            className='pr-4 font-medium text-red-500 hover:underline cursor-pointer'
+          >
+            Delete
+          </span>
+        </>
+      ),
+      header: "Actions",
     }),
   ];
 
@@ -58,8 +141,6 @@ export default function Residents() {
     getResidents();
   },[]);
 
-  console.log(residents);
-
   const table = useReactTable({
     data: residents,
     columns,
@@ -76,8 +157,10 @@ export default function Residents() {
     setFileNameDate(moment(date).format('MM/DD/YYYY'));
   }, [residents]);
 
+  
+
   return (
-    <div className="p-2 max-w-full mx-auto text-white fill-gray-400">
+    <div className="p-2 max-w-full overflow-x-auto mx-auto text-white fill-gray-400">
     <Toaster richColors position="top-center" expand={true} />
 
     <div className="flex justify-between mb-2">
@@ -133,6 +216,22 @@ export default function Residents() {
         )}
       </tbody>
     </table>
+
+    {isViewEditResiModalOpen ? (
+        <ViewEditResidentModal 
+          isOpen={isViewEditResiModalOpen}
+          resident_id = {resident}
+          onClose={closeViewEditResiModal} 
+        />
+      ): (<>TEST</>)}
+
+{isDeleteResiModalOpen ? (
+        <DeleteResidentModal 
+          isDeleteModalOpen={isDeleteResiModalOpen}
+          delete_resident_id = {resident}
+          onCloseDeleteModal={closeDeleteResiModal} 
+        />
+      ): (<>TEST</>)}
     
     {/* pagination */}
     <div className="flex items-center justify-end mt-2 gap-2 text-gray-900 dark:text-white">

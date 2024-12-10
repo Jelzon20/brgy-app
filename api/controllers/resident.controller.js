@@ -55,3 +55,59 @@ export const addResident = async (req, res, next) => {
       next(error);
     }
   };
+
+  export const updateResident = async (req, res, next) => {
+  
+    try {
+      await Resident.findByIdAndUpdate(
+        req.params.resident_id,
+        {
+          $set: {
+            first_name: req.body.first_name,
+            middle_name: req.body.middle_name,
+            last_name: req.body.last_name,
+            residentPicture: req.body.residentPicture,
+            place_of_birth: req.body.place_of_birth,
+            birthday: req.body.birthday,
+            age: req.body.age,
+            relationship: req.body.relationship,
+            civil_status: req.body.civil_status,
+            gender: req.body.gender,
+            voter_status: req.body.voter_status,
+            occupation: req.body.occupation,
+            education_attainment: req.body.education_attainment,
+            email: req.body.email,
+            contact_number: req.body.contact_number,
+            citizenship: req.body.citizenship,
+            fp_method: req.body.fp_method,
+            pwd: req.body.pwd,
+            fourps: req.body.fourps,
+            prev_address: req.body.prev_address,
+            cur_address: req.body.cur_address,
+            length_of_stay: req.body.length_of_stay,
+            household_no: req.body.household_no,
+            precinct_no: req.body.precinct_no
+          },
+        },
+        { new: true }
+      );
+      res.json('Resident record has been updated successfully.');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  export const deleteResident = async (req, res, next) => {
+
+        try {
+          const deletedRecord = await Resident.findByIdAndDelete(req.params.resident_id);
+          if (deletedRecord) {
+            res.json('Resident record has been deleted successfully.');
+          } else {
+            next(errorHandler(400, "No record found with the given ID."));
+          }
+        } catch (error) {
+          next(error);
+        }
+
+  }
