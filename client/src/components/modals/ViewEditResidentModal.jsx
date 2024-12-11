@@ -35,6 +35,7 @@ const ViewEditResidentModal = ({resident_id, onClose, isOpen}) => {
               if (res.ok) {
                 setResident(data);
                 setIsLoading(false);
+                console.log(data)
                 }
 
             } catch (error) {
