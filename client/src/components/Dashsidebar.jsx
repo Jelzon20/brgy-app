@@ -44,14 +44,14 @@ export default function DashSidebar() {
             </Sidebar.Item>
           </Link>
           
-          <Link to='/dashboard?tab=addFamilyRecord'>
+          <Link to='/dashboard?tab=uploadDocument'>
             <Sidebar.Item
-              active={tab === 'addFamilyRecord'}
+              active={tab === 'uploadDocument'}
             //   icon={HiUser}
               labelColor='dark'
               as='div'
             >
-              Add family Record
+              Upload Document
             </Sidebar.Item>
           </Link>
           
