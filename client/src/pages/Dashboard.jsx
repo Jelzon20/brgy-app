@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import DashSidebar from '../components/Dashsidebar';
 import DashProfile from '../components/DashProfile';
 import DashAddResident from '../components/DashAddResident';
-import DashAddFamilyRecord from '../components/DashAddFamilyRecord';
+import UploadDocument from '../components/UploadDocument';
 
 
 export default function Dashboard() {
@@ -25,7 +25,7 @@ export default function Dashboard() {
       {/* profile... */}
       {tab === 'profile' && <DashProfile />}
       {tab === 'addResident' && <DashAddResident />}
-      {tab === 'addFamilyRecord' && <DashAddFamilyRecord />}
+      {tab === 'uploadDocument' && <UploadDocument />}
     
 
     </div>
