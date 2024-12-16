@@ -121,8 +121,12 @@ const UploadDocument = () => {
     const formData = {
       title,
       description,
-      files: { filenames: fileUrls }, // Store the URLs in MongoDB
+      files: [fileUrls], // Store the URLs in MongoDB
     };
+
+    console.log(formData);
+
+    
 
     // try {
     //   const response = await fetch("https://your-server-endpoint.com/upload", {

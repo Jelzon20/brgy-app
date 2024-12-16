@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import userRoutes from './routes/user.route.js';
 import authRoutes from './routes/auth.route.js';
 import residentRoutes from './routes/resident.route.js';
+import documentRoutes from './routes/document.route.js';
 
 
 dotenv.config();
@@ -26,6 +27,7 @@ app.listen(3000, () => {
 app.use('/api/user', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/resident', residentRoutes);
+app.use('/api/document', documentRoutes);
 
 
 app.use((err, req, res, next) => {
