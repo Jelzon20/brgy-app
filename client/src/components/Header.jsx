@@ -1,6 +1,6 @@
 import React from 'react'
 import { Avatar, Button, Dropdown, Navbar, TextInput } from 'flowbite-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import webLogo from "../assets/abucayLogo.png";
 import { useSelector, useDispatch } from 'react-redux';
@@ -15,36 +15,33 @@ export default function Header() {
 
   const [hasToken, setHasToken] = useState(true);
    
-
-    // useEffect(()=> {
-    //   handleCheckToken();
-    //   console.log(hasToken);
-    // });
   
-    // const handleCheckToken = async () => {
-    //   try {
-    //     const res = await fetch('/api/auth/checkAuth', {
-    //       method: 'GET',
-    //     });
-    //     const data = await res.json();
-        
-    //     // console.log("DATAAAAAAAAAAAAA" + data)
-    //     if (data) {
-    //       setHasToken(data.hasToken)
-    //     } else {
-    //       setHasToken(data.hasToken)
-    //     }
-    //   } catch (error) {
-    //     console.log(error.message);
-    //   }
-    // }
-    
-    // useEffect(()=> {
-    //   if(!hasToken){
-    //     handleSignout();
-    //     handleVolunteerSignout();
-    //   }
-    // });
+
+    useEffect(()=> {
+      handleCheckToken();
+    }, []);
+  
+    const handleCheckToken = async () => {
+      try {
+        const res = await fetch('/api/auth/checkAuth', {
+          method: 'GET',
+        });
+        const data = await res.json();
+        if (data) {
+          setHasToken(data.hasToken)
+        } else {
+          setHasToken(data.hasToken)
+        }
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+    useEffect(()=> {
+      if(!hasToken){
+        handleSignout();
+      }
+    });
+  
   const handleSignout = async () => {
     try {
       const res = await fetch('/api/auth/signout', {

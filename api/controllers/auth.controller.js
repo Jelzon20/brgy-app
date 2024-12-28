@@ -4,6 +4,18 @@ import { errorHandler } from "../utils/error.js";
 import jwt from 'jsonwebtoken'
 
 
+export const checkAuth = (req, res, next) => {
+  // console.log(req.cookies.access_token);
+  const token = req.cookies.access_token;
+  if(token) {
+      res.json({hasToken: true});
+  }else{
+    res.json({hasToken: false});
+  }
+    
+};
+
+
 export const signup = async (req, res, next) => {
     const { email, password } = req.body;
     if (
@@ -59,6 +71,8 @@ export const signin = async (req, res, next) => {
     .status(200)
     .cookie('access_token', token, {
       httpOnly: true,
+      secure: true,
+      SameSite: "None"
     })
     .json(rest);
   } catch (error) {
