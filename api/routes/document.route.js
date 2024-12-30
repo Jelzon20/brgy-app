@@ -1,5 +1,5 @@
 import express from 'express';
-import { addDocument } from '../controllers/document.controller.js';
+import { addDocument, getDocuments, updateDocument } from '../controllers/document.controller.js';
 
 const router = express.Router();
 
@@ -10,6 +10,8 @@ const router = express.Router();
 // router.delete('/deleteResident/:resident_id', deleteResident);
 
 router.post('/addDocument', addDocument);
+router.get('/getDocuments', getDocuments);
+router.put('/updateDocument/:id', updateDocument);
 
 
 export default router;

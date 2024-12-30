@@ -112,8 +112,8 @@ export default function Header() {
         <Navbar.Link className='font-semibold' active={path === '/residents'} as={'div'}>
           <Link to='/residents'>Residents</Link>
         </Navbar.Link>
-        <Navbar.Link className='font-semibold' active={path === '/familyRecords'} as={'div'}>
-          <Link to='/family-records'>Family records</Link>
+        <Navbar.Link className='font-semibold' active={path === '/documents'} as={'div'}>
+          <Link to='/documents'>Documents</Link>
         </Navbar.Link>
         
       </Navbar.Collapse>

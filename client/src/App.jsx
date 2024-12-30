@@ -7,7 +7,6 @@ import SignIn from './pages/SignIn'
 import Dashboard from './pages/Dashboard'
 import Header from './components/Header'
 import Residents from './pages/Residents'
-import FamilyRecords from './pages/FamilyRecords'
 import { useSelector} from 'react-redux';
 import PrivateRoute from './components/PrivateRoutes'
 import { useDispatch } from 'react-redux';
@@ -15,6 +14,7 @@ import Page404 from './pages/Page404'
 import {
   signoutSuccess
 } from '../redux/user/userSlice';
+import Documents from './pages/Documents'
 
 export default function App() {
   const { currentUser } = useSelector((state) => state.user);
@@ -47,7 +47,7 @@ export default function App() {
     }
   
     const updateExpireTime = () => {
-      const expireTime = Date.now() + 36000;
+      const expireTime = Date.now() + 3600000;
       localStorage.setItem('expiresIn', expireTime);
     }
   
@@ -89,7 +89,7 @@ export default function App() {
         <Route path="/about" element={<About />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/residents" element={<Residents />} />
-        <Route path="/family-records" element={<FamilyRecords />} />
+        <Route path="/documents" element={<Documents />} />
       </Route>  
 
       <Route path="/*" element={<Page404 />} />

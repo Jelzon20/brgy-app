@@ -8,6 +8,7 @@ import {
 import { app } from "../firebase";
 import { Toaster, toast } from "sonner";
 import { Progress } from "flowbite-react";
+import Loading from "./Loading";
 
 const UploadDocument = () => {
   const [files, setFiles] = useState([]);
@@ -18,6 +19,8 @@ const UploadDocument = () => {
   const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
   const [imageFileUploadError, setImageFileUploadError] = useState(null);
   const [imageFileUploading, setImageFileUploading] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   // Handle file input change (when files are selected via input)
   const handleFileChange = (event) => {
@@ -69,88 +72,95 @@ const UploadDocument = () => {
   // Handle file upload
   const handleUpload = async () => {
     if (!title.trim()) {
-      alert("Please enter a title before uploading.");
+      toast.error("Please enter a title before uploading.");
       return;
     }
-
+  
     // Upload files to Firebase Storage and get download URLs
-    const fileUrls = [];
-    for (let file of files) {
-      try {
-        // Create a storage reference
-        const storage = getStorage(app);
-        const fileName = title + " - " + file.name;
-        const storageRef = ref(storage, `/files/${fileName}`);
-        // Upload the file to Firebase Storage
-        const uploadTask = uploadBytesResumable(storageRef, file);
-        // Get the download URL
-        uploadTask.on(
-          "state_changed",
-          (snapshot) => {
-            const progress =
-              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-    
-            setImageFileUploadProgress(progress.toFixed(0));
-            setImageFileUploading(true);
-          },
-          
-          (error) => {
-            setImageFileUploadError(
-              "Could not upload image (File must be less than 2MB)"
-            );
-            toast.error("Could not upload file (File must be less than 2MB)");
-            setImageFileUploadProgress(null);
-            setImageFileUploading(false);
-          },
-          () => {
-            
-            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-              fileUrls.push(downloadURL);
+    const uploadPromises = files.map((file) => {
+      return new Promise((resolve, reject) => {
+        try {
+          const storage = getStorage(app);
+          const fileName = title + " - " + file.name;
+          const storageRef = ref(storage, `/files/${fileName}`);
+          const uploadTask = uploadBytesResumable(storageRef, file);
+  
+          uploadTask.on(
+            "state_changed",
+            (snapshot) => {
+              const progress =
+                (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+  
+              setImageFileUploadProgress(progress.toFixed(0));
+              setImageFileUploading(true);
+            },
+            (error) => {
+              setImageFileUploadError(
+                "Could not upload image (File must be less than 2MB)"
+              );
+              toast.error("Could not upload file (File must be less than 2MB)");
               setImageFileUploading(false);
-            });
-          }
-        );
-      } catch (error) {
-        console.error("Error uploading file:", error);
-        alert("An error occurred while uploading files.");
-        return;
+              reject(error);
+            },
+            () => {
+              getDownloadURL(uploadTask.snapshot.ref)
+                .then((downloadURL) => {
+                  setImageFileUploading(false);
+                  resolve(downloadURL);
+                })
+                .catch((error) => reject(error));
+            }
+          );
+        } catch (error) {
+          reject(error);
+        }
+      });
+    });
+  
+    try {
+      setIsLoading(true);
+  
+      // Wait for all uploads to complete and get URLs
+      const fileUrls = await Promise.all(uploadPromises);
+  
+      // Construct formData
+      const formData = {
+        title,
+        description,
+        files: fileUrls, // Store the URLs in MongoDB
+      };
+  
+      // Send formData to the server
+      const res = await fetch('/api/document/addDocument', {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+  
+      const data = await res.json();
+  
+      if (!res.ok) {
+        toast.error(data.message);
+      } else {
+        toast.success("Document uploaded successfully.");
+        setTitle('');
+        setDescription('');
+        setFiles([]);
       }
+    } catch (error) {
+      console.error("Error uploading files:", error);
+      toast.error(error.message || "An error occurred while uploading files.");
+    } finally {
+      setIsLoading(false);
     }
-
-    // Now that we have all download URLs, send them to MongoDB
-    const formData = {
-      title,
-      description,
-      files: [fileUrls], // Store the URLs in MongoDB
-    };
-
-    console.log(formData);
-
-    
-
-    // try {
-    //   const response = await fetch("https://your-server-endpoint.com/upload", {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify(formData),
-    //   });
-
-    //   if (response.ok) {
-    //     alert("Files uploaded successfully!");
-    //     setFiles([]);
-    //     setTitle("");
-    //   } else {
-    //     alert("Failed to upload files.");
-    //   }
-    // } catch (error) {
-    //   console.error("Error saving data:", error);
-    //   alert("An error occurred while saving data.");
-    // }
   };
 
   return (
     <div className="w-9/12 mx-auto">
-    <div className="flex flex-col items-center min-h-screen p-6">
+      <Toaster richColors position="top-center" expand={true} />
+      {isLoading ? (<Loading />) : (<div className="flex flex-col items-center min-h-screen p-6">
       <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-lg">
         <h3 className="text-2xl font-bold text-gray-800 mb-4 text-center">
           Upload Documents
@@ -245,7 +255,7 @@ const UploadDocument = () => {
           Upload Files
         </button>
       </div>
-    </div>
+    </div> )}
     </div>
   );
 };
