@@ -1,4 +1,5 @@
 import React from 'react'
+import { Button } from 'flowbite-react';
 import GenderCharts from "../charts/GenderCharts";
 
 export default function Home() {
@@ -8,6 +9,7 @@ export default function Home() {
       <div className="bg-white w-56 p-6 rounded-lg shadow">
         <GenderCharts />
       </div>
+
     </div>
   )
 }
