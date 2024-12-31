@@ -23,10 +23,11 @@ export const addDocument = async (req, res, next) => {
     try {
       const { page, search } = req.query;
       const pageNumber = parseInt(page, 10) || 1;
-      const pageSize = 10;
+      const pageSize = 12;
   
       // Search and pagination logic
       const documents = await Document.find({ title: new RegExp(search, 'i') })
+        .sort({ updatedAt: -1 })
         .skip((pageNumber - 1) * pageSize)
         .limit(pageSize);
       const total = await Document.countDocuments({ title: new RegExp(search, 'i') });

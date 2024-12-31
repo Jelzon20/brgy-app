@@ -17,7 +17,7 @@ const Documents = () => {
 
   useEffect(() => {
     fetchDocuments();
-  }, []);
+  }, [page, searchTerm]);
 
   const fetchDocuments = async () => {
  
@@ -51,62 +51,22 @@ const Documents = () => {
     setSelectedDocument(null);
   };
 
-  const handleSave = async (updatedDocument) => {
-    const title = updatedDocument.title;
-    const description = updatedDocument.description;
-
-    // const updatedFiles = [updatedDocument.files];
-
-    console.log(updatedDocument);
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this document?")) return;
 
     try {
-
-      const res = await fetch(`/api/document/updateDocument/${selectedDocument._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedDocument),
-      });
-      const data = await res.json();
+      const res = await fetch(`/api/document/deleteDocument/${id}`, { method: "DELETE" });
       if (res.ok) {
-        toast.success("Document updated successfully");
-        setIsModalOpen(false);
-        // fetchDocuments();
-        // Update the document in the state without re-fetching the entire list
-        // setDocuments((prevDocuments) =>
-        //   prevDocuments.map((doc) =>
-        //     doc._id === selectedDocument._id
-        //       ? { ...doc, ...updatedDocument }  // Update only the specific document
-        //       : doc  // Leave other documents unchanged
-        //   )
-        // );
-        fetchDocuments();
+        toast.success("Document deleted successfully.");
+        fetchDocuments(); // Refresh the list
       } else {
-        toast.error(data.message || "Error updating document");
+        toast.error("Failed to delete document.");
       }
     } catch (error) {
-      toast.error("An error occurred while updating the document zz");
+      console.error("Error deleting document:", error);
+      toast.error("An error occurred while deleting the document.");
     }
   };
-
-
-  // const handleDelete = async (id) => {
-  //   if (!window.confirm("Are you sure you want to delete this document?")) return;
-
-  //   try {
-  //     const res = await fetch(`/api/document/${id}`, { method: "DELETE" });
-  //     if (res.ok) {
-  //       toast.success("Document deleted successfully.");
-  //       fetchDocuments(); // Refresh the list
-  //     } else {
-  //       toast.error("Failed to delete document.");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error deleting document:", error);
-  //     toast.error("An error occurred while deleting the document.");
-  //   }
-  // };
 
   return (
     <div className="container mx-auto p-6">
@@ -124,21 +84,20 @@ const Documents = () => {
 
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
     {documents && documents.map((doc) => (
-      <div key={doc._id} className="p-4 bg-white rounded-lg shadow">
-        <h2 className="text-lg font-bold">{doc.title}</h2>
-        <p className="text-sm text-gray-600">{doc.description}</p>
-        <ul className="mt-2">
+      <div key={doc._id} className="flex flex-col justify-between p-4 bg-white rounded-lg shadow">
+        <div className="mb-4">
+        <h2 className="text-lg font-bold">{doc.title}</h2>  
+        <p className="text-sm text-gray-600 mt-4">{doc.description}</p>
+        <ul className="mt-4 ">
           {doc && doc.files.map((url, idx) => {
           
               // Step 1: Extract the filename by splitting at the last '/' and ignoring the 'files/' part
-            // const fileNameWithQuery = url.substring(url.lastIndexOf(  '/o/') + 3).split('?')[0]; // +3 to remove '/o/'
-            // const fileNameSubString = fileNameWithQuery.split("files").join("");
+            const fileNameWithQuery = url.substring(url.lastIndexOf('/o/') + 3).split('?')[0]; // +3 to remove '/o/'
+            const fileNameSubString = fileNameWithQuery.split("files").join("");
 
             // Step 2: Decode the URI component
-            const displayName = decodeURIComponent(url);
+            const displayName = decodeURIComponent(fileNameSubString);
         
-            
-
             return (
               <li key={idx}>
                 <a
@@ -153,10 +112,11 @@ const Documents = () => {
             );
           })}
         </ul>
+        </div>
         <div className="mt-4 flex space-x-2">
           <button
             onClick={() => handleUpdate(doc._id)}
-            className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+            className="bg-indigo-900 text-white px-4 py-2 rounded hover:bg-yellow-600"
           >
             Update
           </button>
@@ -176,7 +136,7 @@ const Documents = () => {
         document={selectedDocument}
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        onSave={handleSave}
+        fetchDocuments={fetchDocuments}
       />
 
   <div className="mt-6 flex justify-center">

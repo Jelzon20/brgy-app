@@ -6,6 +6,7 @@ import authRoutes from './routes/auth.route.js';
 import residentRoutes from './routes/resident.route.js';
 import documentRoutes from './routes/document.route.js';
 import cookieParser from 'cookie-parser';
+import path from 'path';
 
 
 dotenv.config();
@@ -16,6 +17,7 @@ mongoose.connect(process.env.MONGO).then(() => {
     console.log(err);
   });
   
+  const __dirname = path.resolve();
 
 const app = express();
 
@@ -30,6 +32,12 @@ app.use('/api/user', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/resident', residentRoutes);
 app.use('/api/document', documentRoutes);
+
+app.use(express.static(path.join(__dirname, 'client/dist')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+});
 
 
 app.use((err, req, res, next) => {

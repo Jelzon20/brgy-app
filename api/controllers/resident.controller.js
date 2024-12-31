@@ -111,3 +111,23 @@ export const addResident = async (req, res, next) => {
         }
 
   }
+
+
+  export const getGenderCounts = async (req, res) => {
+    try {
+      const genderCounts = await Resident.aggregate([
+        {
+          $group: {
+            _id: "$gender", // Group by the "gender" field
+            count: { $sum: 1 }, // Count the number of occurrences
+          },
+        },
+      ]);
+  
+      res.status(200).json(genderCounts);
+    } catch (error) {
+      console.error("Error fetching gender counts:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  };
+  
